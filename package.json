@@ -4,6 +4,8 @@
   "description": "Smart Git commit message appender for VS Code",
   "version": "0.0.1",
   "icon": "media/icon.png",
+  "repository": "https://github.com/ngd-b/CommiTail",
+  "publisher": "hboot",
   "engines": {
     "vscode": "^1.78.0"
   },
