@@ -1,0 +1,48 @@
+{
+  "name": "commitail",
+  "displayName": "CommiTail",
+  "description": "Smart Git commit message appender for VS Code",
+  "version": "0.0.1",
+  "icon": "media/icon.png",
+  "engines": {
+    "vscode": "^1.78.0"
+  },
+  "main": "./out/extension.js",
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.3",
+    "@types/node": "^20.3.1",
+    "@types/vscode": "^1.78.0"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "commitail.commitWithAppend",
+        "title": "CommiTail: Commit with Append",
+        "category": "Git",
+        "icon": {
+          "light": "media/icon.png",
+          "dark": "media/icon.png"
+        }
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "commitail.commitWithAppend",
+          "when": "scmProvider == git"
+        }
+      ],
+      "scm/title": [
+        {
+          "command": "commitail.commitWithAppend",
+          "when": "scmProvider == git",
+          "group": "2_commit"
+        }
+      ]
+    }
+  }
+}

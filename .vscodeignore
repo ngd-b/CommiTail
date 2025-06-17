@@ -1,0 +1,22 @@
+# Exclude source and config files
+src/**
+.vscode/**
+test/**
+*.ts
+*.map
+
+# Exclude build system files
+node_modules/**
+tsconfig.json
+package-lock.json
+.vscodeignore
+
+# Exclude local dev output
+.gitignore
+commitail.config.json
+
+# Keep only what's needed:
+# - out/ (compiled code)
+# - package.json
+# - README.md
+# - icons, if any

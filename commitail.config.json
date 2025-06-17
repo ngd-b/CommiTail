@@ -1,0 +1,5 @@
+{
+  "appendOptions": ["[skip ci]", "🔧 chore", "🧪 test", "🚀 deploy"],
+  "manual": true,
+  "defaultIndex": 0
+}
