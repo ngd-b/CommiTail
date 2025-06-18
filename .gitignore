@@ -1,5 +1,6 @@
 node_modules
 out
+coverage
 *.vsix
 ._*
 .DS_Store

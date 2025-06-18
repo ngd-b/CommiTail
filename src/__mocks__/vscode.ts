@@ -3,7 +3,7 @@
  */
 
 // 存储内部状态
-let _state = {
+const _state: Record<string, any> = {
   // 模拟窗口状态
   window: {
     showInformationMessage: jest.fn().mockResolvedValue(undefined),
@@ -58,7 +58,7 @@ let _state = {
 // 重置所有模拟状态
 const _reset = () => {
   Object.keys(_state).forEach(key => {
-    const stateObj = _state[key];
+    const stateObj = (_state as Record<string, any>)[key];
     Object.keys(stateObj).forEach(method => {
       if (jest.isMockFunction(stateObj[method])) {
         stateObj[method].mockClear();
