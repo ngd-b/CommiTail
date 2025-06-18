@@ -29,6 +29,11 @@
           "light": "media/icon.png",
           "dark": "media/icon.png"
         }
+      },
+      {
+        "command": "commitail.createConfig",
+        "title": "CommiTail: Create Default Configuration",
+        "category": "Git"
       }
     ],
     "menus": {
@@ -36,6 +41,10 @@
         {
           "command": "commitail.commitWithAppend",
           "when": "scmProvider == git"
+        },
+        {
+          "command": "commitail.createConfig",
+          "when": "workspaceFolderCount >= 1"
         }
       ],
       "scm/title": [

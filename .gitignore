@@ -1,3 +1,5 @@
 node_modules
 out
 *.vsix
+._*
+.DS_Stroe

@@ -1,95 +1,67 @@
 
 # CommiTail
 
-> A GitLens extension to help you append structured suffixes to your commit messages based on custom rules.
+CommiTail 是一个 VS Code 扩展，用于为 Git 提交信息追加标识。
 
-CommiTail 是一款 Git 提交辅助插件，它可以在你提交代码时，自动或手动为提交信息追加标识（如 `[skip ci]`、`🔧 chore` 等），提升提交规范性和效率。
+## 特性
 
----
+- 支持自定义追加项
+- 支持自动/手动模式
+- 支持设置默认追加项
+- 与 GitLens 集成
 
-## ✨ 特性
+## 安装
 
-- ✅ 支持自定义追加项（如 `[skip ci]`, `🧪 test` 等）
-- ✅ 支持自动模式（无需手动选择）
-- ✅ 支持手动选择追加内容（默认模式）
-- ✅ 支持默认使用某个追加项（通过 `defaultIndex` 配置）
-- ✅ 与 GitLens、VS Code 原生 SCM 无缝集成
+### 前置条件
 
----
+- VS Code 1.78.0 或更高版本
+- 已安装 Git 扩展
 
-## 📦 安装
+### 安装方法
 
-请先确保已安装 [GitLens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)。
+1. 克隆本仓库或从 VS Code Marketplace 安装
+2. 按 F5 启动调试
 
-1. 克隆本项目或从 Marketplace 安装（开发中）
-2. 在 VS Code 中打开项目，按 `F5` 启动调试插件
-3. 在源代码管理（SCM）界面右上角点击 `CommiTail: Commit with Append`
+## 配置
 
----
-
-## ⚙️ 配置
-
-在项目根目录下创建 `commitail.config.json` 配置文件：
+在工作区根目录创建 `commitail.config.json` 文件，内容如下：
 
 ```json
 {
   "appendOptions": ["[skip ci]", "🔧 chore", "🧪 test", "🚀 deploy"],
-  "manual": false,
-  "defaultIndex": 1
+  "manual": true,
+  "defaultIndex": 0
 }
-````
-
-### 配置说明
-
-| 字段名             | 类型         | 说明                                             |
-| --------------- | ---------- | ---------------------------------------------- |
-| `appendOptions` | `string[]` | 提交时可追加的后缀内容（支持 emoji、字符串等）                     |
-| `manual`        | `boolean`  | 是否手动选择追加项。为 `false` 时将自动使用 `defaultIndex` 指定的项 |
-| `defaultIndex`  | `number`   | 自动模式下使用的默认下标项，默认为 `0`，如果越界将中止提交                |
-
----
-
-## 🚀 使用方式
-
-1. 正常在 Git 面板输入提交信息（如：`fix: 修复登录异常`）
-2. 提交前点击右上角 CommiTail 图标，或命令面板运行 `CommiTail: Commit with Append`
-3. 插件将自动或手动为提交信息追加内容，如：
-
-```
-fix: 修复登录异常 🔧 chore
 ```
 
-> ⚠️ 注意：请先输入提交信息，再点击插件执行。若未输入将提示错误。
+### 配置项说明
 
----
+- `appendOptions`: 追加选项数组，每个选项都是一个字符串
+- `manual`: 是否手动选择追加项
+  - `true`: 每次提交时弹出选择框
+  - `false`: 使用 `defaultIndex` 指定的选项
+- `defaultIndex`: 默认选项的索引（仅在 `manual` 为 `false` 时有效）
 
-## 🧪 开发调试
+### 配置文件验证
 
-```bash
-# 安装依赖
-npm install
+CommiTail 会自动验证配置文件的有效性，包括：
 
-# 编译
-npm run compile
+- 检查 `appendOptions` 是否为非空数组且每个选项都是字符串
+- 检查 `manual` 是否为布尔值
+- 检查 `defaultIndex` 是否为有效的整数且在 `appendOptions` 数组范围内
 
-# 调试（F5 启动 Extension Development Host）
-```
+如果配置文件无效，CommiTail 会显示详细的错误信息，并提供创建默认配置的选项。
 
-项目结构：
+### 创建默认配置
 
-```
-.
-├── src/extension.ts          // 插件主逻辑
-├── commitail.config.json     // 示例配置
-├── package.json              // 插件元信息
-├── out/                      // 构建产物
-└── README.md
-```
+您可以通过以下方式创建默认配置文件：
 
----
+1. 使用命令面板（Ctrl+Shift+P 或 Cmd+Shift+P）执行 `CommiTail: Create Default Configuration` 命令
+2. 当配置文件不存在或无效时，点击错误消息中的 "创建示例配置" 按钮
 
-## 📝 License
+## 使用方法
 
-Apache © 2025 [hboot](https://github.com/ngd-b)
-
----
+1. 在 Git 提交输入框中输入提交信息
+2. 点击 CommiTail 图标或运行 `CommiTail: Commit with Append` 命令
+3. 如果 `manual` 为 `true`，选择要追加的后缀
+4. CommiTail 会自动将选择的后缀追加到提交信息中并执行提交
