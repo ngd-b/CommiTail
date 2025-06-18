@@ -265,46 +265,15 @@ export function activate(context: vscode.ExtensionContext) {
 
       const finalMessage = `${originalMessage} ${selectedSuffix}`;
 
-      try {
-        const success = await execGitCommit(repo, finalMessage);
-        if (success) {
-          // 成功时已经在execGitCommit中处理了清空输入框和刷新仓库
-        }
-      } catch (error: any) {
-        // 失败时不清空输入框，并显示详细错误
-        console.error("CommiTail commit error:", error);
-
-        // 根据错误类型提供不同的用户提示
-        if (error.message.includes("No staged changes")) {
-          // 已经在execGitCommit中处理了这个错误
-        } else if (error.message.includes("not a git repository")) {
-          vscode.window.showErrorMessage(
-            "当前目录不是Git仓库，请确认您在正确的项目中。"
-          );
-        } else if (error.message.includes("Permission denied")) {
-          vscode.window.showErrorMessage(
-            "Git操作权限被拒绝，请检查您的权限设置。"
-          );
-        } else {
-          // 通用错误处理
-          vscode.window
-            .showErrorMessage(`提交失败: ${error.message}`, "查看日志")
-            .then((selection) => {
-              if (selection === "查看日志") {
-                outputChannel.appendLine(`=== 提交失败 ===`);
-                outputChannel.appendLine(
-                  `时间: ${new Date().toLocaleString()}`
-                );
-                outputChannel.appendLine(`消息: ${finalMessage}`);
-                outputChannel.appendLine(`错误: ${error.message}`);
-                outputChannel.appendLine(
-                  `堆栈: ${error.stack || "无堆栈信息"}`
-                );
-                outputChannel.show();
-              }
-            });
-        }
+      // 若已包含同样后缀则不重复添加
+      if (originalMessage.endsWith(selectedSuffix)) {
+        vscode.window.showInformationMessage("提交信息已包含所选后缀，无需重复添加");
+        return;
       }
+
+      // 仅修改输入框内容，不进行 git commit
+      inputBox.value = finalMessage;
+      vscode.window.showInformationMessage("已在提交信息尾部追加后缀");
     }
   );
 
