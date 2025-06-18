@@ -8,7 +8,8 @@ const localize = nls.loadMessageBundle();
 
 // 导出接口以便测试文件使用
 export interface Config {
-  appendOptions: string[];
+  // appendOptions 可以是字符串数组或形如 [值, 描述] 的二维数组
+  appendOptions: Array<string | [string, string]>;
   defaultIndex?: number;
   manual?: boolean;
 }
@@ -105,14 +106,23 @@ export function validateConfig(config: any): ValidationResult {
     };
   }
 
-  // 验证每个选项是否为字符串
+  // 验证每个选项是否为字符串或 [值, 描述] 数组
   for (let i = 0; i < config.appendOptions.length; i++) {
-    if (typeof config.appendOptions[i] !== "string") {
+    const option = config.appendOptions[i];
+    if (typeof option === "string") {
+      continue;
+    }
+    if (
+      !Array.isArray(option) ||
+      option.length < 2 ||
+      typeof option[0] !== "string" ||
+      typeof option[1] !== "string"
+    ) {
       return {
         isValid: false,
         message: localize(
           "extension.appendOptionTypeError",
-          "appendOptions 中的所有元素必须是字符串"
+          "appendOptions 中的元素必须是字符串或长度为2的字符串数组"
         ),
       };
     }
@@ -168,7 +178,12 @@ export function execGitCommit(
   return new Promise<boolean>((resolve, reject) => {
     // 检查是否有暂存变更
     if (!repository.state.indexChanges.length) {
-      vscode.window.showErrorMessage(localize('extension.noStagedChanges', '没有暂存的更改，请先暂存您的更改'));
+      vscode.window.showErrorMessage(
+        localize(
+          "extension.noStagedChanges",
+          "没有暂存的更改，请先暂存您的更改"
+        )
+      );
       return resolve(false);
     }
 
@@ -202,12 +217,20 @@ export function activate(context: vscode.ExtensionContext) {
   const initialConfig = loadConfig();
   if (!initialConfig) {
     outputChannel.appendLine(
-      `[${new Date().toLocaleString()}] ${localize('extension.invalidConfigWarning', '警告: 未找到有效的配置文件或配置无效')}`
+      `[${new Date().toLocaleString()}] ${localize(
+        "extension.invalidConfigWarning",
+        "警告: 未找到有效的配置文件或配置无效"
+      )}`
     );
     outputChannel.appendLine(
-      localize('extension.ensureCreateConfig', '请确保在工作区根目录创建有效的commitail.config.json文件')
+      localize(
+        "extension.ensureCreateConfig",
+        "请确保在工作区根目录创建有效的commitail.config.json文件"
+      )
     );
-    outputChannel.appendLine(localize('extension.configExample', '配置文件示例:'));
+    outputChannel.appendLine(
+      localize("extension.configExample", "配置文件示例:")
+    );
     outputChannel.appendLine(
       JSON.stringify(
         {
@@ -221,10 +244,17 @@ export function activate(context: vscode.ExtensionContext) {
     );
   } else {
     outputChannel.appendLine(
-      `[${new Date().toLocaleString()}] ${localize('extension.configLoadSuccess', '成功加载配置文件')}`
+      `[${new Date().toLocaleString()}] ${localize(
+        "extension.configLoadSuccess",
+        "成功加载配置文件"
+      )}`
     );
     outputChannel.appendLine(
-      localize('extension.appendOptionCount', '已加载 {0} 个后缀选项', initialConfig.appendOptions.length)
+      localize(
+        "extension.appendOptionCount",
+        "已加载 {0} 个后缀选项",
+        initialConfig.appendOptions.length
+      )
     );
   }
 
@@ -241,13 +271,21 @@ export function activate(context: vscode.ExtensionContext) {
     async () => {
       const git = getGitExtension();
       if (!git) {
-        vscode.window.showErrorMessage(localize('extension.gitExtensionNotFound', 'Git扩展未找到，请确保已安装Git扩展'));
+        vscode.window.showErrorMessage(
+          localize(
+            "extension.gitExtensionNotFound",
+            "Git扩展未找到，请确保已安装Git扩展"
+          )
+        );
         return;
       }
       const repo = git.repositories[0];
       if (!repo) {
         vscode.window.showErrorMessage(
-          localize('extension.gitRepoNotFound', '未找到Git仓库，请确保当前工作区是Git仓库')
+          localize(
+            "extension.gitRepoNotFound",
+            "未找到Git仓库，请确保当前工作区是Git仓库"
+          )
         );
         return;
       }
@@ -256,7 +294,9 @@ export function activate(context: vscode.ExtensionContext) {
       const originalMessage = inputBox.value.trim();
 
       if (!originalMessage) {
-        vscode.window.showWarningMessage(localize('extension.inputCommitMessage', '请先输入提交信息'));
+        vscode.window.showWarningMessage(
+          localize("extension.inputCommitMessage", "请先输入提交信息")
+        );
         return;
       }
 
@@ -264,11 +304,18 @@ export function activate(context: vscode.ExtensionContext) {
       const config = loadConfig();
       if (!config) {
         const configPath = getWorkspaceConfigPath() || "commitail.config.json";
-        const createSampleOption = localize('extension.createSampleConfig', '创建示例配置');
-        const viewDocsOption = localize('extension.viewDocs', '查看文档');
+        const createSampleOption = localize(
+          "extension.createSampleConfig",
+          "创建示例配置"
+        );
+        const viewDocsOption = localize("extension.viewDocs", "查看文档");
         vscode.window
           .showErrorMessage(
-            localize('extension.configFileNotFound', '未找到有效的配置文件: {0}', configPath),
+            localize(
+              "extension.configFileNotFound",
+              "未找到有效的配置文件: {0}",
+              configPath
+            ),
             createSampleOption,
             viewDocsOption
           )
@@ -288,33 +335,48 @@ export function activate(context: vscode.ExtensionContext) {
       }
       if (!config.appendOptions || config.appendOptions.length === 0) {
         vscode.window.showWarningMessage(
-          localize('extension.appendOptionsNotFound', '配置文件中未找到有效的appendOptions选项')
+          localize(
+            "extension.appendOptionsNotFound",
+            "配置文件中未找到有效的appendOptions选项"
+          )
         );
         return;
       }
 
       let selectedSuffix: string | undefined;
 
-      // manual=false 表示不弹选择框，使用 defaultIndex
       if (config.manual === false) {
         // 默认索引为 0，如果未设置
         const index =
           typeof config.defaultIndex === "number" ? config.defaultIndex : 0;
 
-        // 这里不需要再次检查范围，因为validateConfig已经验证过
-        selectedSuffix = config.appendOptions[index];
+        // 这里不需要再次检查范围，因为 validateConfig 已经验证过
+        const option = config.appendOptions[index];
+        selectedSuffix = Array.isArray(option) ? option[0] : option;
       } else {
-        selectedSuffix = await vscode.window.showQuickPick(
-          config.appendOptions,
-          {
-            placeHolder: localize('extension.selectSuffixPlaceholder', '选择要追加的提交信息后缀'),
-            canPickMany: false,
+        // 构造 QuickPickItem 列表，支持描述信息
+        const quickPickItems: vscode.QuickPickItem[] = config.appendOptions.map(
+          (opt) => {
+            if (Array.isArray(opt)) {
+              return { label: opt[0], description: opt[1] };
+            }
+            return { label: opt };
           }
         );
 
-        if (selectedSuffix === undefined) {
+        const picked = await vscode.window.showQuickPick(quickPickItems, {
+          placeHolder: localize(
+            "extension.selectSuffixPlaceholder",
+            "选择要追加的提交信息后缀"
+          ),
+          canPickMany: false,
+        });
+
+        if (!picked) {
           return; // 用户取消选择
         }
+
+        selectedSuffix = picked.label || picked.description;
       }
 
       const finalMessage = `${originalMessage} ${selectedSuffix}`;
@@ -322,14 +384,19 @@ export function activate(context: vscode.ExtensionContext) {
       // 若已包含同样后缀则不重复添加
       if (originalMessage.endsWith(selectedSuffix)) {
         vscode.window.showInformationMessage(
-          localize('extension.commitMessageContainsSuffix', '提交信息已包含所选后缀，无需重复添加')
+          localize(
+            "extension.commitMessageContainsSuffix",
+            "提交信息已包含所选后缀，无需重复添加"
+          )
         );
         return;
       }
 
       // 仅修改输入框内容，不进行 git commit
       inputBox.value = finalMessage;
-      vscode.window.showInformationMessage(localize('extension.suffixAppended', '已在提交信息尾部追加后缀'));
+      vscode.window.showInformationMessage(
+        localize("extension.suffixAppended", "已在提交信息尾部追加后缀")
+      );
     }
   );
 
@@ -348,15 +415,17 @@ export function deactivate() {}
 export async function createDefaultConfig(): Promise<boolean> {
   const configPath = getWorkspaceConfigPath();
   if (!configPath) {
-    vscode.window.showErrorMessage(localize('extension.noWorkspace', '没有打开的工作区，无法创建配置文件'));
+    vscode.window.showErrorMessage(
+      localize("extension.noWorkspace", "没有打开的工作区，无法创建配置文件")
+    );
     return false;
   }
 
   // 检查文件是否已存在
   if (fs.existsSync(configPath)) {
-    const overwriteOption = localize('extension.overwrite', '覆盖');
+    const overwriteOption = localize("extension.overwrite", "覆盖");
     const overwrite = await vscode.window.showInformationMessage(
-      localize('extension.configFileExists', '配置文件已存在，是否覆盖？'),
+      localize("extension.configFileExists", "配置文件已存在，是否覆盖？"),
       overwriteOption
     );
     if (overwrite !== overwriteOption) {
@@ -405,11 +474,21 @@ export async function createDefaultConfig(): Promise<boolean> {
     }
 
     vscode.window.showInformationMessage(
-      localize('extension.configCreated', '配置文件已创建并已添加到 .gitignore: {0}', configPath)
+      localize(
+        "extension.configCreated",
+        "配置文件已创建并已添加到 .gitignore: {0}",
+        configPath
+      )
     );
     return true;
   } catch (error: any) {
-    vscode.window.showErrorMessage(localize('extension.configCreationError', '创建配置文件时发生错误: {0}', error.message));
+    vscode.window.showErrorMessage(
+      localize(
+        "extension.configCreationError",
+        "创建配置文件时发生错误: {0}",
+        error.message
+      )
+    );
     return false;
   }
 }

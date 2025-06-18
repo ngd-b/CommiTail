@@ -51,7 +51,28 @@ describe("validateConfig 函数测试", () => {
 
     const result = validateConfig(invalidConfig as any);
     expect(result.isValid).toBe(false);
-    expect(result.message).toContain("appendOptions 中的所有元素必须是字符串");
+    expect(result.message).toContain("appendOptions 中的元素必须是字符串或长度为2的字符串数组");
+  });
+
+  // 二维数组支持测试
+  test("appendOptions 包含 [值, 描述] 时应通过验证", () => {
+    const validConfig: Config = {
+      appendOptions: [["feat", "新增功能"], ["fix", "修复 bug"], "docs"],
+      manual: true,
+      defaultIndex: 1,
+    };
+    const result = validateConfig(validConfig);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("appendOptions 中的子数组长度不足时应返回错误", () => {
+    const invalidConfig = {
+      appendOptions: [["only value"], "feat"],
+      manual: true,
+    };
+    const result = validateConfig(invalidConfig as any);
+    expect(result.isValid).toBe(false);
+    expect(result.message).toContain("appendOptions 中的元素必须是字符串或长度为2的字符串数组");
   });
 
   // manual 测试
