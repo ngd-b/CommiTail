@@ -2,12 +2,12 @@
   "name": "commitail",
   "displayName": "%displayName%",
   "description": "%description%",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "icon": "media/icon.png",
   "repository": "https://github.com/ngd-b/CommiTail",
   "publisher": "hboot",
   "engines": {
-    "vscode": "^1.78.0"
+    "vscode": "^1.88.0"
   },
   "main": "./out/extension.js",
   "activationEvents": [
