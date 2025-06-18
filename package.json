@@ -59,7 +59,7 @@
         {
           "command": "commitail.commitWithAppend",
           "when": "scmProvider == git",
-          "group": "2_commit"
+          "group": "navigation"
         }
       ]
     }
