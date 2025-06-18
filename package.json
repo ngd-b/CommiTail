@@ -2,7 +2,7 @@
   "name": "commitail",
   "displayName": "CommiTail",
   "description": "Smart Git commit message appender for VS Code",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "icon": "media/icon.png",
   "repository": "https://github.com/ngd-b/CommiTail",
   "publisher": "hboot",
