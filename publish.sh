@@ -18,14 +18,14 @@ set -euo pipefail
 # 确保依赖已安装
 npm install --silent
 
+# 发布新版本
+npx bumpp --no-push
+
 # 编译扩展
 npm run compile
 
 # 打包扩展
 npx vsce package
-
-# 发布新版本
-npx bumpp --no-push
 
 # 发布到 VS Code Marketplace
 # 如果已设置 VSCE_PAT 则使用，否则让 vsce 读取登录缓存或交互式处理

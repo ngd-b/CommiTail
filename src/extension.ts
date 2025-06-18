@@ -351,7 +351,28 @@ export async function createDefaultConfig(): Promise<boolean> {
       JSON.stringify(defaultConfig, null, 2),
       'utf-8'
     );
-    vscode.window.showInformationMessage(`配置文件已创建: ${configPath}`);
+
+    // 将配置文件加入 .gitignore
+    try {
+      const workspaceRoot = path.dirname(configPath);
+      const gitignorePath = path.join(workspaceRoot, ".gitignore");
+      let gitignoreContent = "";
+      if (fs.existsSync(gitignorePath)) {
+        gitignoreContent = fs.readFileSync(gitignorePath, "utf-8");
+      }
+      const ignoreEntry = "commitail.config.json";
+      const hasEntry = gitignoreContent
+        .split(/\r?\n/)
+        .some((line) => line.trim() === ignoreEntry || line.trim() === `/${ignoreEntry}`);
+      if (!hasEntry) {
+        const prefixNewline = gitignoreContent === "" || gitignoreContent.endsWith("\n") ? "" : "\n";
+        fs.appendFileSync(gitignorePath, `${prefixNewline}${ignoreEntry}\n`);
+      }
+    } catch (e) {
+      console.warn(".gitignore 处理时出错: ", e);
+    }
+
+    vscode.window.showInformationMessage(`配置文件已创建并已添加到 .gitignore: ${configPath}`);
     return true;
   } catch (error: any) {
     vscode.window.showErrorMessage(`创建配置文件时发生错误: ${error.message}`);

@@ -6,6 +6,7 @@ import { createDefaultConfig } from '../extension';
 // 模拟fs模块
 jest.mock('fs', () => ({
   writeFileSync: jest.fn(),
+  appendFileSync: jest.fn(),
   existsSync: jest.fn(),
   readFileSync: jest.fn(),
 }));
@@ -27,7 +28,7 @@ describe('createDefaultConfig 函数测试', () => {
     jest.clearAllMocks();
   });
 
-  test('成功创建默认配置文件', async () => {
+  test('成功创建默认配置文件并写入 .gitignore', async () => {
     // 模拟文件不存在
     (fs.existsSync as jest.Mock).mockReturnValue(false);
     
@@ -45,6 +46,20 @@ describe('createDefaultConfig 函数测试', () => {
     expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
       expect.stringContaining('配置文件已创建')
     );
+  });
+
+  test('.gitignore 已包含条目时不应重复写入', async () => {
+    // 假设 gitignore 已包含条目
+    (fs.existsSync as jest.Mock).mockImplementation((p: string) => {
+      if (p.endsWith('.gitignore')) return true;
+      return false;
+    });
+    (fs.readFileSync as jest.Mock).mockReturnValue('commitail.config.json\n');
+
+    await createDefaultConfig();
+
+    // appendFileSync 不应被调用
+    expect(fs.appendFileSync).not.toHaveBeenCalled();
   });
 
   test('文件已存在时询问用户是否覆盖', async () => {
