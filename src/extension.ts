@@ -290,15 +290,22 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      const inputBox = repo.inputBox;
-      const originalMessage = inputBox.value.trim();
-
-      if (!originalMessage) {
+      // 检查当前仓库是否有变更（包含已暂存和未暂存）
+      if (
+        repo.state.indexChanges.length === 0 &&
+        repo.state.workingTreeChanges.length === 0
+      ) {
         vscode.window.showWarningMessage(
-          localize("extension.inputCommitMessage", "请先输入提交信息")
+          localize(
+            "extension.noChanges",
+            "当前没有任何文件变更，无法追加提交信息"
+          )
         );
         return;
       }
+
+      const inputBox = repo.inputBox;
+      const originalMessage = inputBox.value.trim();
 
       // 每次命令执行时重新加载配置，以便获取最新配置
       const config = loadConfig();
@@ -379,7 +386,10 @@ export function activate(context: vscode.ExtensionContext) {
         selectedSuffix = picked.label || picked.description;
       }
 
-      const finalMessage = `${originalMessage} ${selectedSuffix}`;
+      const finalMessage =
+        originalMessage === ""
+          ? `${selectedSuffix}`
+          : `${originalMessage} ${selectedSuffix}`;
 
       // 若已包含同样后缀则不重复添加
       if (originalMessage.endsWith(selectedSuffix)) {

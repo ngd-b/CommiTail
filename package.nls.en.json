@@ -23,5 +23,6 @@
   "extension.overwrite": "Overwrite",
   "extension.configCreated": "Configuration file created and added to .gitignore: {0}",
   "extension.configCreationError": "Error occurred while creating configuration file: {0}",
-  "extension.noStagedChanges": "No staged changes, please stage your changes first"
+  "extension.noStagedChanges": "No staged changes, please stage your changes first",
+  "extension.noChanges": "No file changes detected, cannot append commit message"
 }
