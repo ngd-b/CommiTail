@@ -17,7 +17,8 @@
   "scripts": {
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "test": "jest"
+    "test": "jest",
+    "release": "npx bumpp"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",

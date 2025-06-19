@@ -1,0 +1,66 @@
+# GitHub Actions workflow: Build, package and publish CommiTail
+# 触发条件：当推送符合 v* 格式的新 tag 时触发
+
+# yaml-language-server: $schema=ignore
+name: Release VS Code Extension
+
+on:
+  push:
+    tags:
+      - "v*" # 任何以 v 开头的 tag，例如 v1.2.0
+
+jobs:
+  build:
+    name: Build & Package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile
+        run: |
+          if [ -f package.json ]; then
+            npm run compile --if-present
+          fi
+
+      - name: Package VSIX
+        run: npx vsce package -o commiTail.vsix
+
+      - name: Upload Artifact (VSIX)
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix
+          path: commiTail.vsix
+
+  release:
+    name: GitHub Release & Marketplace Publish
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download VSIX artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix
+
+      - name: Create GitHub Release & Upload Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: commiTail.vsix
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to VS Code Marketplace
+        run: npx vsce publish -p "$VSCE_TOKEN" --packagePath commiTail.vsix
+        env:
+          VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }} # 请在仓库 Secrets 中配置 VSCE_TOKEN
