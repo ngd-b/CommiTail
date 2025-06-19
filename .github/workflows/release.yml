@@ -9,6 +9,8 @@ on:
     tags:
       - "v*" # 任何以 v 开头的 tag，例如 v1.2.0
 
+permissions:
+  contents: write
 jobs:
   build:
     name: Build & Package
