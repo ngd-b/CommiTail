@@ -6,7 +6,7 @@ test/**
 *.map
 
 # Exclude build system files
-node_modules/**
+# node_modules/**
 tsconfig.json
 package-lock.json
 .vscodeignore
