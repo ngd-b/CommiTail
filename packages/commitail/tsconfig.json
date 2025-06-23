@@ -5,12 +5,12 @@
     "outDir": "out",
     "lib": ["es2020"],
     "sourceMap": true,
-    "rootDir": "packages/commitail/src",
+    "rootDir": "src",
     "strict": true,
     "noImplicitAny": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true
   },
-  "exclude": ["node_modules", ".vscode-test", "packages/commitail/src/__tests__", "**/._*"]
+  "exclude": ["node_modules", ".vscode-test", "src/__tests__", "**/._*"]
 }

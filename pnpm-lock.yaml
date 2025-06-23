@@ -6,47 +6,101 @@ settings:
 
 catalogs:
   default:
+    '@types/jest':
+      specifier: 30.0.0
+      version: 30.0.0
+    '@types/node':
+      specifier: 24.0.3
+      version: 24.0.3
+    '@types/vscode':
+      specifier: 1.101.0
+      version: 1.101.0
     bumpp:
-      specifier: ^10.2.0
+      specifier: 10.2.0
       version: 10.2.0
+    jest:
+      specifier: 30.0.2
+      version: 30.0.2
+    ts-jest:
+      specifier: 29.4.0
+      version: 29.4.0
+    typescript:
+      specifier: 5.8.3
+      version: 5.8.3
+    vsce:
+      specifier: 2.15.0
+      version: 2.15.0
+    vscode-nls:
+      specifier: 5.2.0
+      version: 5.2.0
+    vscode-nls-dev:
+      specifier: 4.0.4
+      version: 4.0.4
 
 importers:
 
   .:
-    dependencies:
+    devDependencies:
+      '@types/jest':
+        specifier: 'catalog:'
+        version: 30.0.0
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.0.3
+      '@types/vscode':
+        specifier: 'catalog:'
+        version: 1.101.0
       bumpp:
         specifier: 'catalog:'
         version: 10.2.0
+      jest:
+        specifier: 'catalog:'
+        version: 30.0.2(@types/node@24.0.3)
+      ts-jest:
+        specifier: 'catalog:'
+        version: 29.4.0(@babel/core@7.27.4)(@jest/transform@30.0.2)(@jest/types@30.0.1)(babel-jest@30.0.2(@babel/core@7.27.4))(jest-util@30.0.2)(jest@30.0.2(@types/node@24.0.3))(typescript@5.8.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.3
+      vsce:
+        specifier: 'catalog:'
+        version: 2.15.0
+      vscode-nls:
+        specifier: 'catalog:'
+        version: 5.2.0
+      vscode-nls-dev:
+        specifier: 'catalog:'
+        version: 4.0.4
 
   packages/commitail:
     dependencies:
       vscode-nls:
-        specifier: ''
+        specifier: 'catalog:'
         version: 5.2.0
     devDependencies:
       '@types/jest':
-        specifier: ''
+        specifier: 'catalog:'
         version: 30.0.0
       '@types/node':
-        specifier: ''
+        specifier: 'catalog:'
         version: 24.0.3
       '@types/vscode':
-        specifier: ''
+        specifier: 'catalog:'
         version: 1.101.0
       jest:
-        specifier: ''
+        specifier: 'catalog:'
         version: 30.0.2(@types/node@24.0.3)
       ts-jest:
-        specifier: ''
+        specifier: 'catalog:'
         version: 29.4.0(@babel/core@7.27.4)(@jest/transform@30.0.2)(@jest/types@30.0.1)(babel-jest@30.0.2(@babel/core@7.27.4))(jest-util@30.0.2)(jest@30.0.2(@types/node@24.0.3))(typescript@5.8.3)
       typescript:
-        specifier: ''
+        specifier: 'catalog:'
         version: 5.8.3
       vsce:
-        specifier: ''
+        specifier: 'catalog:'
         version: 2.15.0
       vscode-nls-dev:
-        specifier: ''
+        specifier: 'catalog:'
         version: 4.0.4
 
 packages:
