@@ -1,73 +1,11 @@
 {
   "name": "commitail",
-  "displayName": "%displayName%",
-  "description": "%description%",
   "version": "0.0.6",
-  "icon": "media/icon.png",
   "repository": "https://github.com/ngd-b/CommiTail",
-  "publisher": "hboot",
-  "engines": {
-    "vscode": "^1.88.0"
-  },
-  "main": "./out/extension.js",
-  "activationEvents": [
-    "onCommand:commitail.commitWithAppend",
-    "onCommand:commitail.createConfig"
-  ],
   "scripts": {
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "test": "jest",
     "release": "npx bumpp"
   },
-  "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "@types/node": "^20.19.1",
-    "@types/vscode": "^1.88.0",
-    "jest": "^30.0.0",
-    "ts-jest": "^29.4.0",
-    "typescript": "^5.1.3",
-    "vscode-nls-dev": "^4.0.4",
-    "vsce": "^2.15.0"
-  },
-  "contributes": {
-    "commands": [
-      {
-        "command": "commitail.commitWithAppend",
-        "title": "%commitWithAppendTitle%",
-        "category": "Git",
-        "icon": {
-          "light": "media/icon.png",
-          "dark": "media/icon.png"
-        }
-      },
-      {
-        "command": "commitail.createConfig",
-        "title": "%createConfigTitle%",
-        "category": "Git"
-      }
-    ],
-    "menus": {
-      "commandPalette": [
-        {
-          "command": "commitail.commitWithAppend",
-          "when": "scmProvider == git"
-        },
-        {
-          "command": "commitail.createConfig",
-          "when": "workspaceFolderCount >= 1"
-        }
-      ],
-      "scm/title": [
-        {
-          "command": "commitail.commitWithAppend",
-          "when": "scmProvider == git",
-          "group": "navigation"
-        }
-      ]
-    }
-  },
   "dependencies": {
-    "vscode-nls": "^5.2.0"
+    "bumpp": "catalog:"
   }
 }
