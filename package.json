@@ -5,16 +5,7 @@
   "scripts": {
     "release": "npx bumpp"
   },
-  "devDependencies": {
-    "@types/jest": "catalog:",
-    "@types/node": "catalog:",
-    "@types/vscode": "catalog:",
-    "bumpp": "catalog:",
-    "jest": "catalog:",
-    "ts-jest": "catalog:",
-    "typescript": "catalog:",
-    "vsce": "catalog:",
-    "vscode-nls": "catalog:",
-    "vscode-nls-dev": "catalog:"
+  "dependencies": {
+    "bumpp": "catalog:"
   }
 }
