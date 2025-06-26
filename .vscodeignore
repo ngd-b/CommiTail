@@ -17,6 +17,10 @@ package-lock.json
 .gitignore
 commitail.config.json
 
+scripts
+
+docs
+
 # Keep only what's needed:
 # - out/ (compiled code)
 # - package.json
