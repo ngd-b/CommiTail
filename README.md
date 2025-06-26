@@ -6,7 +6,7 @@
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/ngd-b/CommiTail/release.yml?label=build)](https://github.com/ngd-b/CommiTail/actions)
 
 <p align="center">
-  <img src="./media/icon.png" alt="CommiTail Logo" width="128" />
+  <img src="./public/icon.png" alt="CommiTail Logo" width="128" />
 </p>
 
 CommiTail 是一个 VS Code 扩展，用于为 Git 提交信息追加标识。
@@ -41,7 +41,6 @@ CommiTail 是一个 VS Code 扩展，用于为 Git 提交信息追加标识。
   "defaultIndex": 0
 }
 ```
-
 
 ### 配置文件验证
 
@@ -95,4 +94,3 @@ CommiTail 会自动验证配置文件的有效性，包括：
 1. 编写提交信息并执行命令。
 2. Quick Pick 弹窗展示所有 `appendOptions`（若为二维数组则显示描述）。
 3. 选择一个后缀后立即追加到提交信息中；若已存在同样后缀则提示并不重复添加。
-
