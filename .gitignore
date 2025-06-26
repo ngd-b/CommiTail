@@ -4,3 +4,7 @@ coverage
 *.vsix
 ._*
 .DS_Store
+
+# docs
+docs/.vitepress/cache/
+docs/.vitepress/dist/
