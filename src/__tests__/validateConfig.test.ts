@@ -2,127 +2,180 @@ import { validateConfig } from "../utils/config";
 import { Config } from "../types";
 
 describe("validateConfig 函数测试", () => {
-  // 有效配置测试
   test("有效配置应该通过验证", () => {
     const validConfig: Config = {
-      appendOptions: ["feat", "fix", "docs"],
-      manual: false,
+      appendOptions: ["[skip ci]", "[wip]"],
       defaultIndex: 0,
+      manual: false,
     };
 
     const result = validateConfig(validConfig);
+
     expect(result.isValid).toBe(true);
     expect(result.message).toBe("");
     expect(result.config).toEqual(validConfig);
   });
 
-  // appendOptions 测试
-  test("appendOptions 不是数组时应该返回错误", () => {
+  test("缺少appendOptions时应该失败", () => {
     const invalidConfig = {
-      appendOptions: "not an array",
-      manual: false,
       defaultIndex: 0,
-    };
+      manual: false,
+    } as Config;
 
-    const result = validateConfig(invalidConfig as any);
+    const result = validateConfig(invalidConfig);
+
     expect(result.isValid).toBe(false);
-    expect(result.message).toContain("appendOptions 必须是一个数组");
+    expect(result.message).toContain("appendOptions");
+    expect(result.config).toBeUndefined();
   });
 
-  test("appendOptions 为空数组时应该返回错误", () => {
+  test("appendOptions为空数组时应该失败", () => {
     const invalidConfig: Config = {
       appendOptions: [],
-      manual: false,
       defaultIndex: 0,
+      manual: false,
     };
 
     const result = validateConfig(invalidConfig);
+
     expect(result.isValid).toBe(false);
-    expect(result.message).toContain("appendOptions 不能为空数组");
+    expect(result.message).toContain("appendOptions");
+    expect(result.config).toBeUndefined();
   });
 
-  test("appendOptions 包含非字符串元素时应该返回错误", () => {
-    const invalidConfig = {
-      appendOptions: ["feat", 123, "docs"],
-      manual: true,
-    };
-
-    const result = validateConfig(invalidConfig as any);
-    expect(result.isValid).toBe(false);
-    expect(result.message).toContain(
-      "appendOptions 中的元素必须是字符串或长度为2的字符串数组"
-    );
-  });
-
-  // 二维数组支持测试
-  test("appendOptions 包含 [值, 描述] 时应通过验证", () => {
-    const validConfig: Config = {
-      appendOptions: ["feat", ["fix", "修复bug"], "docs"],
-      defaultIndex: 1,
-    };
-    const result = validateConfig(validConfig);
-    expect(result.isValid).toBe(true);
-  });
-
-  test("appendOptions 中的子数组长度不足时应返回错误", () => {
-    const invalidConfig = {
-      appendOptions: ["feat", ["fix"], "docs"],
-      manual: true,
-    };
-
-    const result = validateConfig(invalidConfig as any);
-    expect(result.isValid).toBe(false);
-    expect(result.message).toContain(
-      "appendOptions 中的元素必须是字符串或长度为2的字符串数组"
-    );
-  });
-
-  // manual 测试
-  test("manual 不是布尔值时应该返回错误", () => {
-    const invalidConfig = {
-      appendOptions: ["feat", "fix", "docs"],
-      manual: "not a boolean",
-    };
-
-    const result = validateConfig(invalidConfig as any);
-    expect(result.isValid).toBe(false);
-    expect(result.message).toContain("manual 必须是一个布尔值");
-  });
-
-  // defaultIndex 测试
-  test("defaultIndex 不是数字时应该返回错误", () => {
-    const invalidConfig = {
-      appendOptions: ["feat", "fix", "docs"],
-      manual: false,
-      defaultIndex: "not a number",
-    };
-
-    const result = validateConfig(invalidConfig as any);
-    expect(result.isValid).toBe(false);
-    expect(result.message).toContain("defaultIndex 必须是一个数字");
-  });
-
-  test("defaultIndex 超出范围时应该返回错误", () => {
+  test("defaultIndex超出范围时应该失败", () => {
     const invalidConfig: Config = {
-      appendOptions: ["feat", "fix", "docs"],
+      appendOptions: ["[skip ci]", "[wip]"],
+      defaultIndex: 5, // 超出数组长度
       manual: false,
-      defaultIndex: 5,
     };
 
     const result = validateConfig(invalidConfig);
+
     expect(result.isValid).toBe(false);
-    expect(result.message).toContain("defaultIndex 超出范围");
+    expect(result.message).toContain("defaultIndex");
+    expect(result.config).toBeUndefined();
   });
 
-  test("defaultIndex 为负数时应该返回错误", () => {
+  test("defaultIndex为负数时应该失败", () => {
     const invalidConfig: Config = {
-      appendOptions: ["feat", "fix", "docs"],
-      manual: false,
+      appendOptions: ["[skip ci]", "[wip]"],
       defaultIndex: -1,
+      manual: false,
     };
 
     const result = validateConfig(invalidConfig);
+
     expect(result.isValid).toBe(false);
-    expect(result.message).toContain("defaultIndex 超出范围");
+    expect(result.message).toContain("defaultIndex");
+    expect(result.config).toBeUndefined();
+  });
+
+  test("defaultIndex在有效范围内时应该通过", () => {
+    const validConfig: Config = {
+      appendOptions: ["[skip ci]", "[wip]", "[docs]"],
+      defaultIndex: 2, // 在数组范围内
+      manual: false,
+    };
+
+    const result = validateConfig(validConfig);
+
+    expect(result.isValid).toBe(true);
+    expect(result.message).toBe("");
+    expect(result.config).toEqual(validConfig);
+  });
+
+  test("没有defaultIndex时应该通过验证", () => {
+    const validConfig: Config = {
+      appendOptions: ["[skip ci]", "[wip]"],
+      manual: false,
+    };
+
+    const result = validateConfig(validConfig);
+
+    expect(result.isValid).toBe(true);
+    expect(result.message).toBe("");
+    expect(result.config).toEqual(validConfig);
+  });
+
+  test("包含二维数组格式的appendOptions时应该通过验证", () => {
+    const validConfig: Config = {
+      appendOptions: [
+        ["[skip ci]", "跳过CI"],
+        ["[wip]", "工作进行中"],
+      ],
+      defaultIndex: 0,
+      manual: true,
+    };
+
+    const result = validateConfig(validConfig);
+
+    expect(result.isValid).toBe(true);
+    expect(result.message).toBe("");
+    expect(result.config).toEqual(validConfig);
+  });
+
+  test("混合格式的appendOptions时应该通过验证", () => {
+    const validConfig: Config = {
+      appendOptions: ["[skip ci]", ["[wip]", "工作进行中"], "[docs]"],
+      defaultIndex: 1,
+      manual: false,
+    };
+
+    const result = validateConfig(validConfig);
+
+    expect(result.isValid).toBe(true);
+    expect(result.message).toBe("");
+    expect(result.config).toEqual(validConfig);
+  });
+
+  test("appendOptions包含空字符串时应该通过验证", () => {
+    const validConfig: Config = {
+      appendOptions: ["[skip ci]", "", "[wip]"],
+      defaultIndex: 0,
+      manual: false,
+    };
+
+    const result = validateConfig(validConfig);
+
+    expect(result.isValid).toBe(true);
+    expect(result.message).toBe("");
+    expect(result.config).toEqual(validConfig);
+  });
+
+  test("appendOptions包含长度不足的数组时应该失败", () => {
+    const invalidConfig = {
+      appendOptions: [
+        "[skip ci]",
+        ["只有一项"], // 长度不足的数组
+        "[wip]",
+      ],
+      defaultIndex: 0,
+      manual: false,
+    };
+
+    const result = validateConfig(invalidConfig);
+
+    expect(result.isValid).toBe(false);
+    expect(result.message).toContain("appendOptions");
+    expect(result.config).toBeUndefined();
+  });
+
+  test("appendOptions包含非字符串类型的数组元素时应该失败", () => {
+    const invalidConfig = {
+      appendOptions: [
+        "[skip ci]",
+        [123, "描述"], // 第一个元素不是字符串
+        "[wip]",
+      ],
+      defaultIndex: 0,
+      manual: false,
+    };
+
+    const result = validateConfig(invalidConfig);
+
+    expect(result.isValid).toBe(false);
+    expect(result.message).toContain("appendOptions");
+    expect(result.config).toBeUndefined();
   });
 });

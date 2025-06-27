@@ -6,9 +6,9 @@
 // 重置所有模拟
 beforeEach(() => {
   jest.resetAllMocks();
-  
+
   // 重置vscode模拟状态
-  const vscode = require('vscode');
+  const vscode = require("vscode");
   if (vscode._reset) {
     vscode._reset();
   }
@@ -20,14 +20,14 @@ afterEach(() => {
 });
 
 // 模拟文件系统
-jest.mock('fs', () => ({
+jest.mock("fs", () => ({
   readFileSync: jest.fn(),
   writeFileSync: jest.fn(),
   existsSync: jest.fn(),
 }));
 
 // 模拟child_process
-jest.mock('child_process', () => ({
+jest.mock("child_process", () => ({
   exec: jest.fn(),
 }));
 

@@ -33,8 +33,15 @@ describe("createDefaultConfig 函数测试", () => {
   });
 
   test("成功创建默认配置文件并写入 .gitignore", async () => {
-    // 模拟文件不存在
-    (fs.existsSync as jest.Mock).mockReturnValue(false);
+    // 模拟配置文件不存在，.gitignore存在
+    (fs.existsSync as jest.Mock).mockImplementation((p: string) => {
+      if (p.endsWith("commitail.config.json")) return false;
+      if (p.endsWith(".gitignore")) return true;
+      return false;
+    });
+
+    // 模拟.gitignore内容为空
+    (fs.readFileSync as jest.Mock).mockReturnValue("");
 
     // 模拟写入文件成功
     (fs.writeFileSync as jest.Mock).mockImplementation(() => {});
@@ -60,11 +67,18 @@ describe("createDefaultConfig 函数测试", () => {
   });
 
   test(".gitignore 已包含条目时不应重复写入", async () => {
-    // 模拟文件不存在
-    (fs.existsSync as jest.Mock).mockReturnValue(false);
+    // 模拟配置文件不存在，.gitignore存在
+    (fs.existsSync as jest.Mock).mockImplementation((p: string) => {
+      if (p.endsWith("commitail.config.json")) return false;
+      if (p.endsWith(".gitignore")) return true;
+      return false;
+    });
 
-    // 模拟.gitignore已存在且包含条目
+    // 模拟.gitignore已包含条目
     (fs.readFileSync as jest.Mock).mockReturnValue("commitail.config.json\n");
+
+    // 模拟写入文件成功
+    (fs.writeFileSync as jest.Mock).mockImplementation(() => {});
 
     // 调用createDefaultConfig函数
     await createDefaultConfig();
@@ -106,6 +120,9 @@ describe("createDefaultConfig 函数测试", () => {
     (vscode.window.showInformationMessage as jest.Mock).mockResolvedValue(
       "覆盖"
     );
+
+    // 模拟写入文件成功
+    (fs.writeFileSync as jest.Mock).mockImplementation(() => {});
 
     // 调用createDefaultConfig函数
     await createDefaultConfig();

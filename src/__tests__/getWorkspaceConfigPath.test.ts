@@ -3,6 +3,11 @@ import * as path from "path";
 import { getWorkspaceConfigPath } from "../utils/config";
 
 describe("getWorkspaceConfigPath 函数测试", () => {
+  beforeEach(() => {
+    // 重置所有模拟
+    jest.clearAllMocks();
+  });
+
   // 保存原始的workspaceFolders
   const originalWorkspaceFolders = vscode.workspace.workspaceFolders;
 
@@ -22,6 +27,7 @@ describe("getWorkspaceConfigPath 函数测试", () => {
     };
     Object.defineProperty(vscode.workspace, "workspaceFolders", {
       get: () => [mockWorkspaceFolder],
+      configurable: true,
     });
 
     // 调用getWorkspaceConfigPath函数
@@ -36,6 +42,7 @@ describe("getWorkspaceConfigPath 函数测试", () => {
     // 模拟没有工作区
     Object.defineProperty(vscode.workspace, "workspaceFolders", {
       get: () => undefined,
+      configurable: true,
     });
 
     // 调用getWorkspaceConfigPath函数
@@ -47,12 +54,19 @@ describe("getWorkspaceConfigPath 函数测试", () => {
 
   test("多个工作区时使用第一个工作区", () => {
     // 模拟多个工作区
-    const mockWorkspaceFolders = [
-      { uri: { fsPath: "/mock/workspace1" }, name: "mock1", index: 0 },
-      { uri: { fsPath: "/mock/workspace2" }, name: "mock2", index: 1 },
-    ];
+    const mockWorkspaceFolder1 = {
+      uri: { fsPath: "/mock/workspace1" },
+      name: "mock1",
+      index: 0,
+    };
+    const mockWorkspaceFolder2 = {
+      uri: { fsPath: "/mock/workspace2" },
+      name: "mock2",
+      index: 1,
+    };
     Object.defineProperty(vscode.workspace, "workspaceFolders", {
-      get: () => mockWorkspaceFolders,
+      get: () => [mockWorkspaceFolder1, mockWorkspaceFolder2],
+      configurable: true,
     });
 
     // 调用getWorkspaceConfigPath函数

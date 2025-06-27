@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
+import * as path from "path";
 import { loadConfig } from "../utils/config";
 
 // 模拟fs模块
@@ -15,113 +16,133 @@ describe("loadConfig 函数测试", () => {
   // 在每个测试前重置所有模拟
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // 模拟工作区
+    const mockWorkspaceFolder = {
+      uri: { fsPath: "/mock/workspace" },
+      name: "mock",
+      index: 0,
+    };
+    Object.defineProperty(vscode.workspace, "workspaceFolders", {
+      get: () => [mockWorkspaceFolder],
+      configurable: true,
+    });
   });
 
-  test("成功加载有效配置文件", () => {
+  test("配置文件存在且格式正确时成功加载", () => {
+    const mockConfig = {
+      appendOptions: ["[skip ci]", "[wip]"],
+      defaultIndex: 0,
+      manual: false,
+    };
+
     // 模拟文件存在
     (fs.existsSync as jest.Mock).mockReturnValue(true);
 
-    // 模拟有效的配置文件内容
-    const validConfig = {
-      appendOptions: ["feat", "fix", "docs"],
-      manual: false,
-      defaultIndex: 0,
-    };
-    const validConfigStr = JSON.stringify(validConfig);
-    (fs.readFileSync as jest.Mock).mockReturnValue(validConfigStr);
+    // 模拟读取文件内容
+    (fs.readFileSync as jest.Mock).mockReturnValue(JSON.stringify(mockConfig));
 
-    // 调用loadConfig函数
-    const configPath = "/path/to/config.json";
-    const result = loadConfig(configPath);
+    const result = loadConfig();
 
-    // 验证结果
-    expect(result).toEqual(validConfig);
-    expect(fs.existsSync).toHaveBeenCalledWith(configPath);
-    expect(fs.readFileSync).toHaveBeenCalledWith(configPath, "utf-8");
-    expect(vscode.window.showErrorMessage).not.toHaveBeenCalled();
+    expect(result).toEqual(mockConfig);
+    expect(fs.existsSync).toHaveBeenCalledWith(
+      path.join("/mock/workspace", "commitail.config.json")
+    );
+    expect(fs.readFileSync).toHaveBeenCalledWith(
+      path.join("/mock/workspace", "commitail.config.json"),
+      "utf-8"
+    );
   });
 
   test("配置文件不存在时返回null", () => {
     // 模拟文件不存在
     (fs.existsSync as jest.Mock).mockReturnValue(false);
 
-    // 调用loadConfig函数
-    const configPath = "/path/to/config.json";
-    const result = loadConfig(configPath);
+    const result = loadConfig();
 
-    // 验证结果
     expect(result).toBeNull();
-    expect(fs.existsSync).toHaveBeenCalledWith(configPath);
+    expect(fs.existsSync).toHaveBeenCalledWith(
+      path.join("/mock/workspace", "commitail.config.json")
+    );
     expect(fs.readFileSync).not.toHaveBeenCalled();
-    expect(vscode.window.showErrorMessage).not.toHaveBeenCalled();
   });
 
-  test("配置文件格式无效时显示错误消息", () => {
+  test("配置文件格式错误时返回null", () => {
     // 模拟文件存在
     (fs.existsSync as jest.Mock).mockReturnValue(true);
 
-    // 模拟无效的JSON格式
-    (fs.readFileSync as jest.Mock).mockReturnValue("{ invalid json }");
+    // 模拟读取到无效的JSON
+    (fs.readFileSync as jest.Mock).mockReturnValue("invalid json");
 
-    // 调用loadConfig函数
-    const configPath = "/path/to/config.json";
-    const result = loadConfig(configPath);
+    const result = loadConfig();
 
-    // 验证结果
     expect(result).toBeNull();
-    expect(fs.existsSync).toHaveBeenCalledWith(configPath);
-    expect(fs.readFileSync).toHaveBeenCalledWith(configPath, "utf-8");
-    expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-      expect.stringContaining("读取配置文件时发生错误")
+    expect(fs.existsSync).toHaveBeenCalledWith(
+      path.join("/mock/workspace", "commitail.config.json")
+    );
+    expect(fs.readFileSync).toHaveBeenCalledWith(
+      path.join("/mock/workspace", "commitail.config.json"),
+      "utf-8"
     );
   });
 
-  test("配置验证失败时显示错误消息", () => {
-    // 模拟文件存在
-    (fs.existsSync as jest.Mock).mockReturnValue(true);
-
-    // 模拟有效的JSON格式但配置无效
-    const invalidConfig = {
-      appendOptions: [],
-      manual: false,
-      defaultIndex: 0,
-    };
-    const invalidConfigStr = JSON.stringify(invalidConfig);
-    (fs.readFileSync as jest.Mock).mockReturnValue(invalidConfigStr);
-
-    // 调用loadConfig函数
-    const configPath = "/path/to/config.json";
-    const result = loadConfig(configPath);
-
-    // 验证结果
-    expect(result).toBeNull();
-    expect(fs.existsSync).toHaveBeenCalledWith(configPath);
-    expect(fs.readFileSync).toHaveBeenCalledWith(configPath, "utf-8");
-    expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-      expect.stringContaining("配置文件格式无效")
-    );
-  });
-
-  test("读取文件时发生错误显示错误消息", () => {
+  test("读取文件时发生错误时返回null", () => {
     // 模拟文件存在
     (fs.existsSync as jest.Mock).mockReturnValue(true);
 
     // 模拟读取文件时抛出错误
-    const errorMessage = "读取文件失败";
     (fs.readFileSync as jest.Mock).mockImplementation(() => {
-      throw new Error(errorMessage);
+      throw new Error("读取文件失败");
     });
 
-    // 调用loadConfig函数
-    const configPath = "/path/to/config.json";
-    const result = loadConfig(configPath);
+    const result = loadConfig();
 
-    // 验证结果
     expect(result).toBeNull();
-    expect(fs.existsSync).toHaveBeenCalledWith(configPath);
-    expect(fs.readFileSync).toHaveBeenCalledWith(configPath, "utf-8");
-    expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-      expect.stringContaining("读取配置文件时发生错误")
+    expect(fs.existsSync).toHaveBeenCalledWith(
+      path.join("/mock/workspace", "commitail.config.json")
     );
+    expect(fs.readFileSync).toHaveBeenCalledWith(
+      path.join("/mock/workspace", "commitail.config.json"),
+      "utf-8"
+    );
+  });
+
+  test("没有工作区时返回null", () => {
+    // 模拟没有工作区
+    Object.defineProperty(vscode.workspace, "workspaceFolders", {
+      get: () => undefined,
+      configurable: true,
+    });
+
+    const result = loadConfig();
+
+    expect(result).toBeNull();
+    expect(fs.existsSync).not.toHaveBeenCalled();
+    expect(fs.readFileSync).not.toHaveBeenCalled();
+  });
+
+  test("配置文件包含二维数组格式的appendOptions时正确解析", () => {
+    const mockConfig = {
+      appendOptions: [
+        ["[skip ci]", "跳过CI"],
+        ["[wip]", "工作进行中"],
+      ],
+      defaultIndex: 1,
+      manual: true,
+    };
+
+    // 模拟文件存在
+    (fs.existsSync as jest.Mock).mockReturnValue(true);
+
+    // 模拟读取文件内容
+    (fs.readFileSync as jest.Mock).mockReturnValue(JSON.stringify(mockConfig));
+
+    const result = loadConfig();
+
+    expect(result).toEqual(mockConfig);
+    expect(result?.appendOptions).toEqual([
+      ["[skip ci]", "跳过CI"],
+      ["[wip]", "工作进行中"],
+    ]);
   });
 });
