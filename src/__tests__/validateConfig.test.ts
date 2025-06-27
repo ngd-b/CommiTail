@@ -1,6 +1,5 @@
-import * as vscode from "vscode";
-import * as fs from "fs";
-import { validateConfig, Config, ValidationResult } from "../extension";
+import { validateConfig } from "../utils/config";
+import { Config } from "../types";
 
 describe("validateConfig 函数测试", () => {
   // 有效配置测试
@@ -45,20 +44,20 @@ describe("validateConfig 函数测试", () => {
   test("appendOptions 包含非字符串元素时应该返回错误", () => {
     const invalidConfig = {
       appendOptions: ["feat", 123, "docs"],
-      manual: false,
-      defaultIndex: 0,
+      manual: true,
     };
 
     const result = validateConfig(invalidConfig as any);
     expect(result.isValid).toBe(false);
-    expect(result.message).toContain("appendOptions 中的元素必须是字符串或长度为2的字符串数组");
+    expect(result.message).toContain(
+      "appendOptions 中的元素必须是字符串或长度为2的字符串数组"
+    );
   });
 
   // 二维数组支持测试
   test("appendOptions 包含 [值, 描述] 时应通过验证", () => {
     const validConfig: Config = {
-      appendOptions: [["feat", "新增功能"], ["fix", "修复 bug"], "docs"],
-      manual: true,
+      appendOptions: ["feat", ["fix", "修复bug"], "docs"],
       defaultIndex: 1,
     };
     const result = validateConfig(validConfig);
@@ -67,12 +66,15 @@ describe("validateConfig 函数测试", () => {
 
   test("appendOptions 中的子数组长度不足时应返回错误", () => {
     const invalidConfig = {
-      appendOptions: [["only value"], "feat"],
+      appendOptions: ["feat", ["fix"], "docs"],
       manual: true,
     };
+
     const result = validateConfig(invalidConfig as any);
     expect(result.isValid).toBe(false);
-    expect(result.message).toContain("appendOptions 中的元素必须是字符串或长度为2的字符串数组");
+    expect(result.message).toContain(
+      "appendOptions 中的元素必须是字符串或长度为2的字符串数组"
+    );
   });
 
   // manual 测试
@@ -80,7 +82,6 @@ describe("validateConfig 函数测试", () => {
     const invalidConfig = {
       appendOptions: ["feat", "fix", "docs"],
       manual: "not a boolean",
-      defaultIndex: 0,
     };
 
     const result = validateConfig(invalidConfig as any);

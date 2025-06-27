@@ -6,7 +6,6 @@
   "icon": "public/icon.png",
   "repository": "https://github.com/ngd-b/CommiTail",
   "publisher": "hboot",
-  "type": "module",
   "engines": {
     "vscode": "^1.88.0"
   },
@@ -19,6 +18,10 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
     "release": "npx bumpp",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs"
@@ -27,6 +30,9 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^20.19.1",
     "@types/vscode": "^1.88.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
     "jest": "^30.0.0",
     "ts-jest": "^29.4.0",
     "typescript": "^5.1.3",
